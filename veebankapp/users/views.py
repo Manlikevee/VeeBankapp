@@ -23,6 +23,8 @@ class SampleAPI(APIView):
 @permission_classes([IsAuthenticated])
 def userprofile(request):
     user = request.user
+    Profile.objects.update_or_create(
+        user=request.user)
     user_profile = Profile.objects.filter(user=user).first()
     userprofile = Completeprofile(user_profile)
 
