@@ -32,8 +32,8 @@ class Profile(models.Model):
     # Add other fields as needed, and set them as blank=True and null=True
 
     def save(self, *args, **kwargs):
-        if not self.accountnumber:
-            self.accountnumber = s
+        if not self.account_number:
+            self.account_number = s
         super().save(*args, **kwargs)
     def __str__(self):
         return self.user.username
