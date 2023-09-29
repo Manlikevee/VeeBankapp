@@ -30,7 +30,6 @@ class Profile(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     # Add other fields as needed, and set them as blank=True and null=True
-
     def save(self, *args, **kwargs):
         if not self.account_number:
             self.account_number = s
