@@ -32,3 +32,6 @@ def userprofile(request):
         'userprofile': userprofile.data
     }
     return Response(context, status=status.HTTP_200_OK)
+
+
+

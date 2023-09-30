@@ -36,3 +36,59 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
     def __str__(self):
         return self.user.username
+
+
+# Define a model for the user's bank account
+class BankAccount(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    account_number = models.CharField(max_length=20, unique=True)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return self.account_number
+
+# Define a model for transaction types
+class TransactionType(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+# Define a model for transactions
+class Transaction(models.Model):
+    TRANSACTION_STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Completed', 'Completed'),
+        ('Failed', 'Failed'),
+    ]
+
+    sender_bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name='sent_transactions', null=True, blank=True)
+    recipient_bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name='received_transactions', null=True, blank=True)
+    sender_user = models.CharField(max_length=100, null=True, blank=True)
+    recipient_user = models.CharField(max_length=100, null=True, blank=True)
+    transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE)
+    reference = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=TRANSACTION_STATUS_CHOICES, default='Pending')
+    payment_data = models.JSONField(null=True, blank=True)
+    narration = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    Bank_name = models.CharField(max_length=100)
+    transfer_payment = models.JSONField(null=True, blank=True)
+    bill_payment = models.JSONField(null=True, blank=True)
+    # Credit or Debit
+    is_credit = models.BooleanField(default=False)
+    is_debit = models.BooleanField(default=False)
+
+    # Reversal
+    is_reversal = models.BooleanField(default=False)
+    original_transaction = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.get_transaction_type_display()} - {self.reference}"
+
+# Define choices for transaction status
+
+
+
+
