@@ -27,7 +27,7 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     account_number = models.CharField(max_length=20, unique=True, blank=True, null=True, default=None)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    balance = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 
     # Add other fields as needed, and set them as blank=True and null=True
     def save(self, *args, **kwargs):

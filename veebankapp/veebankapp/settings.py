@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'dashboard',
     'users'
@@ -67,7 +68,8 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(days=140),
     'SLIDING_TOKEN_REFRESH_ON_LOGIN': True,
     'SLIDING_TOKEN_REFRESH_ON_REFRESH': True,
-    'ROTATE_REFRESH_TOKENS': False,
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
