@@ -73,7 +73,8 @@ class Transaction(models.Model):
     payment_data = models.JSONField(null=True, blank=True)
     narration = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    Bank_name = models.CharField(max_length=100)
+    Bank_name = models.CharField(max_length=100, default='')
+    Bank_accountnumber = models.CharField(max_length=100 ,default='')
     transfer_payment = models.JSONField(null=True, blank=True)
     bill_payment = models.JSONField(null=True, blank=True)
     # Credit or Debit
@@ -85,7 +86,7 @@ class Transaction(models.Model):
     original_transaction = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.get_transaction_type_display()} - {self.reference}"
+        return f" {self.reference} + {self.sender_user}"
 
 # Define choices for transaction status
 

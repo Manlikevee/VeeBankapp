@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from users.models import Profile
-from users.serializer import Completeprofile
+from users.models import Profile, Transaction
+from users.serializer import Completeprofile, Transactionsserializer
 
 
 # Create your views here.
@@ -34,4 +34,14 @@ def userprofile(request):
     return Response(context, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+def transactions(request):
+    alltransactions = Transaction.objects.all()
+    transactiondata = Transactionsserializer(alltransactions, many=True)
+
+    response_data = {
+        'transactiondata': transactiondata.data
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
 

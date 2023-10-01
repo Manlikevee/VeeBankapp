@@ -28,3 +28,26 @@ class Completeprofile(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'  # Or specify the fields you want to expose
+
+class BankAccountserializer(serializers.ModelSerializer):
+    user = Userserializer()
+    class Meta:
+        model = BankAccount
+        fields = '__all__'  # Or specify the fields you want to expose
+
+
+class TransactionTypeserializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransactionType
+        fields = '__all__'  # Or specify the fields you want to expose
+
+
+
+class Transactionsserializer(serializers.ModelSerializer):
+    sender_bank_account = BankAccountserializer()
+    recipient_bank_account = BankAccountserializer()
+    transaction_type = TransactionTypeserializer()
+
+    class Meta:
+        model = Transaction
+        fields = '__all__'  # Or specify the fields you want to expose
