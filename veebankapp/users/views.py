@@ -53,4 +53,4 @@ def get_account_details(request, id):
 
         return Response({'data': serializer.data}, status=status.HTTP_200_OK)
     except BankAccount.DoesNotExist:
-        return Response({'data': 'We Are Unable To Process Your Request'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'data': 'Incorrect Details'}, status=status.HTTP_400_BAD_REQUEST)
