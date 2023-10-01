@@ -41,7 +41,9 @@ class Profile(models.Model):
 # Define a model for the user's bank account
 class BankAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    account_number = models.CharField(max_length=20, unique=True)
+    account_number = models.CharField(max_length=11, unique=True)
+    account_name = models.CharField(max_length=90,null=True, blank=True )
+    bank = models.CharField(max_length=90,null=True, blank=True, default='Vee Bank' )
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
