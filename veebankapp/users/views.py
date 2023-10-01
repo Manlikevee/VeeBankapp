@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from users.models import Profile, Transaction
-from users.serializer import Completeprofile, Transactionsserializer
+from users.models import Profile, Transaction, BankAccount
+from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer
 
 
 # Create your views here.
@@ -45,3 +45,12 @@ def transactions(request):
 
     return Response(response_data, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_account_details(request, id):
+    try:
+        bank_account = BankAccount.objects.get(account_number=id)
+        serializer = BankAccountserializer(bank_account)
+
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    except BankAccount.DoesNotExist:
+        return Response({'data': 'We Are Unable To Process Your Request'}, status=status.HTTP_400_BAD_REQUEST)
