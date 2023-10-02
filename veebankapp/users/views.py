@@ -80,7 +80,7 @@ def donetransactionss(request):
         narration = request.data.get('narration')
         user_profile = get_object_or_404(Profile, user=my_user)
         if my_account:
-            if pin == user_profile.pin:
+            if pin == str(user_profile.pin):
                 debit_amount = Decimal(amount)
 
                 if my_account.balance >= debit_amount:
