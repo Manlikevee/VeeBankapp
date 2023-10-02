@@ -19,4 +19,6 @@ urlpatterns = [
     path('bank/resolve/<str:id>', get_account_details, name='get_account_details'),
     path('Newtransaction', donetransactionss, name='donetransactions'),
 
+    path('new_transaction', new_transaction, name='new_transaction'),
+
 ]

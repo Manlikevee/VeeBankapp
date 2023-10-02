@@ -148,3 +148,25 @@ def donetransactionss(request):
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
     return JsonResponse({'saved': False, 'message': 'Invalid request method'})
+
+
+
+
+import json
+
+@api_view(['POST'])
+def new_transaction(request):
+    if request.method == 'POST':
+        # Parse JSON data from the request body
+        data = json.loads(request.body.decode('utf-8'))
+        pin = data.get('pin')
+        account_number = data.get('account_number')
+        amount = data.get('amount')
+        narration = data.get('narration')
+
+        # Now you can use pin, account_number, amount, and narration as expected
+        # ... Your transaction handling logic ...
+
+        return Response({'detail': 'Success'}, status=status.HTTP_200_OK)
+
+    return Response({'detail': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
