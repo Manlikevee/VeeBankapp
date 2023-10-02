@@ -64,20 +64,20 @@ def get_account_details(request, id):
 
 
 from decimal import Decimal
-import json
 
-@api_view(['POST'])
+
+@api_view(['POST', 'GET'])
 def donetransactionss(request):
     my_user = User.objects.filter(id=1).first()
     my_account = BankAccount.objects.filter(user=my_user).first()
+
     transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
     s = shortuuid.ShortUUID().random(length=20)
     if request.method == 'POST':
-        data = json.loads(request.body.decode('utf-8'))
-        pin = data.get('pin')
-        account_number = data.get('account_number')
-        amount = data.get('amount')
-        narration = data.get('narration')
+        pin = request.data.get('pin')
+        account_number = request.data.get('account_number')
+        amount = request.data.get('amount')
+        narration = request.data.get('narration')
         user_profile = get_object_or_404(Profile, user=my_user)
         if my_account:
             if pin == user_profile.pin:
@@ -144,12 +144,12 @@ def donetransactionss(request):
         else:
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return JsonResponse({'saved': False, 'message': 'Invalid request method'})
+    return Response( status=status.HTTP_200_OK)
 
 
 
 
-
+import json
 
 @api_view(['POST'])
 def new_transaction(request):
