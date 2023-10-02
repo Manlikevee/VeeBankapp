@@ -74,10 +74,10 @@ def donetransactionss(request):
     transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
     s = shortuuid.ShortUUID().random(length=20)
     if request.method == 'POST':
-        pin = '1234'
-        account_number = '0774369899'
-        amount = '5'
-        narration = 'veeeeeeeeee'
+        pin = request.data.get('pin')
+        account_number = request.data.get('account_number')
+        amount = request.data.get('amount')
+        narration = request.data.get('narration')
         user_profile = get_object_or_404(Profile, user=my_user)
         if my_account:
             if pin == user_profile.pin:
