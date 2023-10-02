@@ -56,7 +56,7 @@ def BankAccounts(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def transactions(request):
-    alltransactions = donetransaction.objects.filter(user=request.user)
+    alltransactions = donetransaction.objects.filter(user=request.user).all().order_by('-id')
     transactiondata = Donetransaction(alltransactions, many=True)
 
     response_data = {
