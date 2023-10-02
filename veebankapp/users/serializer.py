@@ -64,7 +64,7 @@ class PostTransactionsserializer(serializers.ModelSerializer):
 
 
 class Donetransaction(serializers.ModelSerializer):
-    transaction = Transactionsserializer()
+    transaction = PostTransactionsserializer()
 
     class Meta:
         model = donetransaction
