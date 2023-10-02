@@ -18,7 +18,7 @@ urlpatterns = [
     path('transactions/', transactions, name='sample-transactions'),
     path('bank/resolve/<str:id>', get_account_details, name='get_account_details'),
     path('Newtransaction', donetransactionss, name='donetransactions'),
-
+    path('BankAccounts', BankAccounts, name='BankAccounts'),
     path('new_transaction', new_transaction, name='new_transaction'),
 
 ]

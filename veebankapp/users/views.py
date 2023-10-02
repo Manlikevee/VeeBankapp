@@ -32,12 +32,26 @@ def userprofile(request):
         user=request.user)
     user_profile = Profile.objects.filter(user=user).first()
     userprofile = Completeprofile(user_profile)
-
+    useraccount = BankAccount.objects.filter(user=user).first()
+    useraccountdata = BankAccountserializer(useraccount)
     context = {
-        'userprofile': userprofile.data
+        'userprofile': userprofile.data,
+        'useraccountdata': useraccountdata.data
     }
     return Response(context, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def BankAccounts(request):
+    user = request.user
+    useraccount = BankAccount.objects.filter(user=user).first()
+    useraccountdata = BankAccountserializer(useraccount)
+
+    context = {
+        'useraccountdata': useraccountdata.data
+    }
+    return Response(context, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -67,8 +81,9 @@ from decimal import Decimal
 
 
 @api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
 def donetransactionss(request):
-    my_user = User.objects.filter(id=1).first()
+    my_user = request.user
     my_account = BankAccount.objects.filter(user=my_user).first()
 
     transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
@@ -129,8 +144,8 @@ def donetransactionss(request):
 
                             debit_bank.balance = debit_bank.balance + debit_amount
                             debit_bank.save()
-
-                            return Response(serializer.data, status=status.HTTP_200_OK)
+                            transaction_serializer = Transactionsserializer(transaction_instance)
+                            return Response(transaction_serializer.data, status=status.HTTP_200_OK)
 
 
                         else:
