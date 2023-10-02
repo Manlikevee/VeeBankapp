@@ -56,7 +56,7 @@ def BankAccounts(request):
 @api_view(['GET'])
 def transactions(request):
     alltransactions = donetransaction.objects.all()
-    transactiondata = Donetransaction(alltransactions, many=True)
+    transactiondata = PostTransactionsserializer(alltransactions, many=True)
 
     response_data = {
         'transactiondata': transactiondata.data
