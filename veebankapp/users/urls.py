@@ -20,5 +20,6 @@ urlpatterns = [
     path('Newtransaction', donetransactionss, name='donetransactions'),
     path('BankAccounts', BankAccounts, name='BankAccounts'),
     path('new_transaction', new_transaction, name='new_transaction'),
-
+    path('singletrans/<str:id>', singletrans, name='singletrans'),
+    path('singletransbackup/<str:id>', singletransbackup, name='singletransbackup'),
 ]

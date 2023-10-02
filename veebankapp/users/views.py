@@ -67,6 +67,29 @@ def transactions(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def singletransbackup(request, id):
+    try:
+        alltransactions = donetransaction.objects.filter(user=request.user).filter(id=id).first()
+        transactiondata = Donetransaction(alltransactions)
+
+        return Response({'data': transactiondata.data}, status=status.HTTP_200_OK)
+    except donetransaction.DoesNotExist:
+        return Response({'data': 'Incorrect Details'}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def singletrans(request, id):
+    try:
+        # Use get instead of filter to retrieve a single object or raise a DoesNotExist exception
+        transaction = donetransaction.objects.get(id=id, user=request.user)
+        # Serialize the transaction data using a serializer
+        serializer = Donetransaction(transaction)  # Replace YourTransactionSerializer with your actual serializer
+
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+    except donetransaction.DoesNotExist:
+        return Response({'data': 'Incorrect Details'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
 def get_account_details(request, id):
     try:
         bank_account = BankAccount.objects.get(account_number=id)
