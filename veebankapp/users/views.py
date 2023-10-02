@@ -54,7 +54,6 @@ def BankAccounts(request):
     return Response(context, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def transactions(request):
     alltransactions = donetransaction.objects.all()
     transactiondata = Donetransaction(alltransactions, many=True)
