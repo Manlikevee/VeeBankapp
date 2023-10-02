@@ -78,9 +78,9 @@ def donetransactionss(request):
         account_number = request.data.get('account_number')
         amount = request.data.get('amount')
         narration = request.data.get('narration')
-        user_profile = get_object_or_404(Profile, user=my_user)
+        pinprofile = Profile.objects.filter(user=request.user).filter(pin=pin).first()
         if my_account:
-            if pin == user_profile.pin:
+            if pin == pinprofile:
                 debit_amount = Decimal(amount)
 
                 if my_account.balance >= debit_amount:
