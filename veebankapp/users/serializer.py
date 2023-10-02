@@ -2,6 +2,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import *
+
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -14,12 +16,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
 
-
 class Userserializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'id']  # Or specify the fields you want to expose
-
 
 
 class Completeprofile(serializers.ModelSerializer):
@@ -29,8 +29,10 @@ class Completeprofile(serializers.ModelSerializer):
         model = Profile
         fields = '__all__'  # Or specify the fields you want to expose
 
+
 class BankAccountserializer(serializers.ModelSerializer):
     user = Userserializer()
+
     class Meta:
         model = BankAccount
         fields = '__all__'  # Or specify the fields you want to expose
@@ -40,7 +42,6 @@ class TransactionTypeserializer(serializers.ModelSerializer):
     class Meta:
         model = TransactionType
         fields = '__all__'  # Or specify the fields you want to expose
-
 
 
 class Transactionsserializer(serializers.ModelSerializer):
@@ -54,13 +55,11 @@ class Transactionsserializer(serializers.ModelSerializer):
 
 
 class PostTransactionsserializer(serializers.ModelSerializer):
-
     class Meta:
         model = Transaction
         fields = ['sender_bank_account', 'recipient_bank_account', 'sender_user', 'recipient_user', 'transaction_type',
-                  'reference', 'amount', 'status', 'narration', 'Bank_name', 'Bank_accountnumber', 'is_debit', 'is_credit'
-                  ]
-
+                  'reference', 'amount', 'status', 'narration', 'Bank_name', 'Bank_accountnumber', 'is_debit',
+                  'is_credit',  'created_at']
 
 
 class Donetransaction(serializers.ModelSerializer):
@@ -69,7 +68,3 @@ class Donetransaction(serializers.ModelSerializer):
     class Meta:
         model = donetransaction
         fields = '__all__'  # Or specify the fields you want to expose
-
-
-
-
