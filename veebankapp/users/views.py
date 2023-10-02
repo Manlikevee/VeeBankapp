@@ -66,16 +66,12 @@ def get_account_details(request, id):
 from decimal import Decimal
 import json
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 def donetransactionss(request):
     my_user = User.objects.filter(id=1).first()
     my_account = BankAccount.objects.filter(user=my_user).first()
-
     transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
     s = shortuuid.ShortUUID().random(length=20)
-    if request.method == 'GET':
-        form_serializer = TransactionFormSerializer()
-        return Response({'form': form_serializer.data})
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         pin = data.get('pin')
