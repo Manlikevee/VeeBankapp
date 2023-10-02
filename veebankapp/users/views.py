@@ -64,7 +64,7 @@ def get_account_details(request, id):
 
 
 from decimal import Decimal
-
+import json
 
 @api_view(['POST', 'GET'])
 def donetransactionss(request):
@@ -77,10 +77,11 @@ def donetransactionss(request):
         form_serializer = TransactionFormSerializer()
         return Response({'form': form_serializer.data})
     if request.method == 'POST':
-        pin = request.data.get('pin')
-        account_number = request.data.get('account_number')
-        amount = request.data.get('amount')
-        narration = request.data.get('narration')
+        data = json.loads(request.body.decode('utf-8'))
+        pin = data.get('pin')
+        account_number = data.get('account_number')
+        amount = data.get('amount')
+        narration = data.get('narration')
         user_profile = get_object_or_404(Profile, user=my_user)
         if my_account:
             if pin == user_profile.pin:
@@ -152,7 +153,7 @@ def donetransactionss(request):
 
 
 
-import json
+
 
 @api_view(['POST'])
 def new_transaction(request):
