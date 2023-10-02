@@ -67,9 +67,8 @@ from decimal import Decimal
 
 
 @api_view(['POST', 'GET'])
-@permission_classes([IsAuthenticated])
 def donetransactionss(request):
-    my_user = request.user
+    my_user = User.objects.filter(id=1).first()
     my_account = BankAccount.objects.filter(user=my_user).first()
 
     transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
