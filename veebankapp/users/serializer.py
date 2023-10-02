@@ -51,3 +51,25 @@ class Transactionsserializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = '__all__'  # Or specify the fields you want to expose
+
+
+class PostTransactionsserializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        fields = ['sender_bank_account', 'recipient_bank_account', 'sender_user', 'recipient_user', 'transaction_type',
+                  'reference', 'amount', 'status', 'narration', 'Bank_name', 'Bank_accountnumber', 'is_debit', 'is_credit'
+                  ]
+
+
+
+class Donetransaction(serializers.ModelSerializer):
+    transaction = Transactionsserializer()
+
+    class Meta:
+        model = donetransaction
+        fields = '__all__'  # Or specify the fields you want to expose
+
+
+
+

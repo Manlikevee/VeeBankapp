@@ -17,6 +17,6 @@ urlpatterns = [
     path('userprofile/', userprofile, name='sample-userprofile'),
     path('transactions/', transactions, name='sample-transactions'),
     path('bank/resolve/<str:id>', get_account_details, name='get_account_details'),
-
+    path('Newtransaction', donetransactionss, name='donetransactions'),
 
 ]

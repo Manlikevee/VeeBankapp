@@ -3,6 +3,8 @@ from django.db import models
 import shortuuid
 
 s = shortuuid.ShortUUID().random(length=10)
+
+
 # Create your models here.
 
 
@@ -26,6 +28,7 @@ class Profile(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    pin = models.PositiveIntegerField(max_length=4, default=1234)
     account_number = models.CharField(max_length=20, unique=True, blank=True, null=True, default=None)
     balance = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 
@@ -34,6 +37,7 @@ class Profile(models.Model):
         if not self.account_number:
             self.account_number = s
         super().save(*args, **kwargs)
+
     def __str__(self):
         return self.user.username
 
@@ -42,12 +46,13 @@ class Profile(models.Model):
 class BankAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     account_number = models.CharField(max_length=11, unique=True)
-    account_name = models.CharField(max_length=90,null=True, blank=True )
-    bank = models.CharField(max_length=90,null=True, blank=True, default='Vee Bank' )
+    account_name = models.CharField(max_length=90, null=True, blank=True)
+    bank = models.CharField(max_length=90, null=True, blank=True, default='Vee Bank')
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return self.account_number
+
 
 # Define a model for transaction types
 class TransactionType(models.Model):
@@ -55,6 +60,7 @@ class TransactionType(models.Model):
 
     def __str__(self):
         return self.name
+
 
 # Define a model for transactions
 class Transaction(models.Model):
@@ -64,8 +70,10 @@ class Transaction(models.Model):
         ('Failed', 'Failed'),
     ]
 
-    sender_bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name='sent_transactions', null=True, blank=True)
-    recipient_bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name='received_transactions', null=True, blank=True)
+    sender_bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name='sent_transactions',
+                                            null=True, blank=True)
+    recipient_bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE,
+                                               related_name='received_transactions', null=True, blank=True)
     sender_user = models.CharField(max_length=100, null=True, blank=True)
     recipient_user = models.CharField(max_length=100, null=True, blank=True)
     transaction_type = models.ForeignKey(TransactionType, on_delete=models.CASCADE)
@@ -76,7 +84,7 @@ class Transaction(models.Model):
     narration = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     Bank_name = models.CharField(max_length=100, default='')
-    Bank_accountnumber = models.CharField(max_length=100 ,default='')
+    Bank_accountnumber = models.CharField(max_length=100, default='')
     transfer_payment = models.JSONField(null=True, blank=True)
     bill_payment = models.JSONField(null=True, blank=True)
     # Credit or Debit
@@ -90,8 +98,24 @@ class Transaction(models.Model):
     def __str__(self):
         return f" {self.reference} + {self.sender_user}"
 
+
 # Define choices for transaction status
 
 
+class donetransaction(models.Model):
+    TRANSACTION_STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Completed', 'Completed'),
+        ('Failed', 'Failed'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=TRANSACTION_STATUS_CHOICES, default='Pending')
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    is_credit = models.BooleanField(default=False)
+    is_debit = models.BooleanField(default=False)
+    is_fundtransfer = models.BooleanField(default=False)
+    is_billpayment = models.BooleanField(default=False)
 
-
+    def __str__(self):
+        return self.status
