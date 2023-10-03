@@ -24,5 +24,4 @@ urlpatterns = [
     path('singletransbackup/<str:id>', singletransbackup, name='singletransbackup'),
     path('airtime', import_data_plans, name='import_data_plans'),
 
-
 ]
