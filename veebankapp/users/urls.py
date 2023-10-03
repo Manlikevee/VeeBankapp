@@ -22,7 +22,7 @@ urlpatterns = [
     path('new_transaction', new_transaction, name='new_transaction'),
     path('singletrans/<str:id>', singletrans, name='singletrans'),
     path('singletransbackup/<str:id>', singletransbackup, name='singletransbackup'),
-    path('import_data_plans', import_data_plans, name='import_data_plans'),
+    path('airtime', import_data_plans, name='import_data_plans'),
 
 
 ]
