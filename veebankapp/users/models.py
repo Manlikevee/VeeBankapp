@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 import shortuuid
+from django.db.models import JSONField
 
 s = shortuuid.ShortUUID().random(length=10)
 
@@ -119,3 +120,11 @@ class donetransaction(models.Model):
 
     def __str__(self):
         return self.status
+
+
+class NetworkDataPlan(models.Model):
+    network = models.CharField(max_length=50)
+    plans = models.JSONField(null=True, blank=True)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Data Plans"

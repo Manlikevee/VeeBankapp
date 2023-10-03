@@ -1,6 +1,6 @@
 import shortuuid
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -9,9 +9,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
-from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction
+from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
-    TransactionTypeserializer, PostTransactionsserializer
+    TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer
 
 
 # Create your views here.
@@ -53,6 +53,7 @@ def BankAccounts(request):
     }
     return Response(context, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def transactions(request):
@@ -76,6 +77,8 @@ def singletransbackup(request, id):
         return Response({'data': transactiondata.data}, status=status.HTTP_200_OK)
     except donetransaction.DoesNotExist:
         return Response({'data': 'Incorrect Details'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def singletrans(request, id):
@@ -88,6 +91,7 @@ def singletrans(request, id):
         return Response({'data': serializer.data}, status=status.HTTP_200_OK)
     except donetransaction.DoesNotExist:
         return Response({'data': 'Incorrect Details'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def get_account_details(request, id):
@@ -182,12 +186,11 @@ def donetransactionss(request):
         else:
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response( status=status.HTTP_200_OK)
-
-
+    return Response(status=status.HTTP_200_OK)
 
 
 import json
+
 
 @api_view(['POST'])
 def new_transaction(request):
@@ -205,3 +208,91 @@ def new_transaction(request):
         return Response({'detail': 'Success'}, status=status.HTTP_200_OK)
 
     return Response({'detail': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+@api_view(['POST', 'GET'])
+def import_data_plans(request):
+    # dataPlans = [
+    #     {
+    #         "network": "Airtel",
+    #         "plans": [
+    #             {"name": "Airtel Daily 50MB", "price": 100, "data": "50MB", "validity": "1 day"},
+    #             {"name": "Airtel Weekly 200MB", "price": 350, "data": "200MB", "validity": "7 days"},
+    #             {"name": "Airtel Monthly 1GB", "price": 1000, "data": "1GB", "validity": "30 days"},
+    #             {"name": "Airtel Monthly 2GB", "price": 2000, "data": "2GB", "validity": "30 days"},
+    #             {"name": "Airtel Monthly 5GB", "price": 3500, "data": "5GB", "validity": "30 days"},
+    #             {"name": "Airtel Night 500MB", "price": 200, "data": "500MB", "validity": "Night"},
+    #             {"name": "Airtel Night 1GB", "price": 350, "data": "1GB", "validity": "Night"},
+    #             {"name": "Airtel Mega 10GB", "price": 5000, "data": "10GB", "validity": "30 days"},
+    #             {"name": "Airtel Mega 20GB", "price": 8000, "data": "20GB", "validity": "30 days"},
+    #             {"name": "Airtel Mega 50GB", "price": 15000, "data": "50GB", "validity": "30 days"},
+    #         ],
+    #     },
+    #     {
+    #         "network": "MTN",
+    #         "plans": [
+    #             {"name": "MTN Daily 50MB", "price": 100, "data": "50MB", "validity": "1 day"},
+    #             {"name": "MTN Weekly 350MB", "price": 350, "data": "350MB", "validity": "7 days"},
+    #             {"name": "MTN Monthly 1.5GB", "price": 1000, "data": "1.5GB", "validity": "30 days"},
+    #             {"name": "MTN Monthly 3GB", "price": 2000, "data": "3GB", "validity": "30 days"},
+    #             {"name": "MTN Monthly 10GB", "price": 5000, "data": "10GB", "validity": "30 days"},
+    #             {"name": "MTN Night 500MB", "price": 200, "data": "500MB", "validity": "Night"},
+    #             {"name": "MTN Night 1GB", "price": 350, "data": "1GB", "validity": "Night"},
+    #             {"name": "MTN Mega 20GB", "price": 8000, "data": "20GB", "validity": "30 days"},
+    #             {"name": "MTN Mega 40GB", "price": 12000, "data": "40GB", "validity": "30 days"},
+    #             {"name": "MTN Mega 100GB", "price": 25000, "data": "100GB", "validity": "30 days"},
+    #         ],
+    #     },
+    #     {
+    #         "network": "Glo",
+    #         "plans": [
+    #             {"name": "Glo Daily 50MB", "price": 100, "data": "50MB", "validity": "1 day"},
+    #             {"name": "Glo Weekly 500MB", "price": 350, "data": "500MB", "validity": "7 days"},
+    #             {"name": "Glo Monthly 2GB", "price": 1000, "data": "2GB", "validity": "30 days"},
+    #             {"name": "Glo Monthly 4.5GB", "price": 2000, "data": "4.5GB", "validity": "30 days"},
+    #             {"name": "Glo Monthly 12GB", "price": 5000, "data": "12GB", "validity": "30 days"},
+    #             {"name": "Glo Night 1GB", "price": 200, "data": "1GB", "validity": "Night"},
+    #             {"name": "Glo Night 2GB", "price": 350, "data": "2GB", "validity": "Night"},
+    #             {"name": "Glo Mega 30GB", "price": 8000, "data": "30GB", "validity": "30 days"},
+    #             {"name": "Glo Mega 60GB", "price": 15000, "data": "60GB", "validity": "30 days"},
+    #             {"name": "Glo Mega 120GB", "price": 25000, "data": "120GB", "validity": "30 days"},
+    #         ],
+    #     },
+    #     {
+    #         "network": "9Mobile",
+    #         "plans": [
+    #             {"name": "9Mobile Daily 40MB", "price": 100, "data": "40MB", "validity": "1 day"},
+    #             {"name": "9Mobile Weekly 150MB", "price": 350, "data": "150MB", "validity": "7 days"},
+    #             {"name": "9Mobile Monthly 1GB", "price": 1000, "data": "1GB", "validity": "30 days"},
+    #             {"name": "9Mobile Monthly 2.5GB", "price": 2000, "data": "2.5GB", "validity": "30 days"},
+    #             {"name": "9Mobile Monthly 5GB", "price": 3500, "data": "5GB", "validity": "30 days"},
+    #             {"name": "9Mobile Night 500MB", "price": 200, "data": "500MB", "validity": "Night"},
+    #             {"name": "9Mobile Night 1GB", "price": 350, "data": "1GB", "validity": "Night"},
+    #             {"name": "9Mobile Mega 40GB", "price": 8000, "data": "40GB", "validity": "30 days"},
+    #             {"name": "9Mobile Mega 80GB", "price": 15000, "data": "80GB", "validity": "30 days"},
+    #             {"name": "9Mobile Mega 150GB", "price": 25000, "data": "150GB", "validity": "30 days"},
+    #         ],
+    #     },
+    #     {
+    #         "network": "Ntel",
+    #         "plans": [
+    #             {"name": "Ntel Daily 50MB", "price": 100, "data": "50MB", "validity": "1 day"},
+    #             {"name": "Ntel Weekly 500MB", "price": 350, "data": "500MB", "validity": "7 days"},
+    #             {"name": "Ntel Monthly 2GB", "price": 1000, "data": "2GB", "validity": "30 days"},
+    #             {"name": "Ntel Monthly 4.5GB", "price": 2000, "data": "4.5GB", "validity": "30 days"},
+    #             {"name": "Ntel Monthly 10GB", "price": 5000, "data": "10GB", "validity": "30 days"},
+    #             {"name": "Ntel Night 1GB", "price": 200, "data": "1GB", "validity": "Night"},
+    #             {"name": "Ntel Night 2GB", "price": 350, "data": "2GB", "validity": "Night"},
+    #             {"name": "Ntel Mega 30GB", "price": 8000, "data": "30GB", "validity": "30 days"},
+    #             {"name": "Ntel Mega 60GB", "price": 15000, "data": "60GB", "validity": "30 days"},
+    #             {"name": "Ntel Mega 120GB", "price": 25000, "data": "120GB", "validity": "30 days"},
+    #         ],
+    #     },
+    # ]
+    #
+    # for plan_data in dataPlans:
+    #     plans_json = plan_data['plans']
+    #     NetworkDataPlan.objects.create(network=plan_data['network'], plans=plans_json)
+
+    queryset = NetworkDataPlan.objects.all()
+    serializer_class = NetworkDataPlanSerializer(queryset, many=True)
+    return Response(serializer_class.data, status=status.HTTP_200_OK)
