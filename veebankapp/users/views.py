@@ -35,9 +35,17 @@ def userprofile(request):
     userprofile = Completeprofile(user_profile)
     useraccount = BankAccount.objects.filter(user=user).first()
     useraccountdata = BankAccountserializer(useraccount)
+    latesttransaction = donetransaction.objects.filter(user=user).last()
+
+    if latesttransaction is not None:
+        transactiondata = Donetransaction(latesttransaction)
+    else:
+        transactiondata = None
+
     context = {
         'userprofile': userprofile.data,
-        'useraccountdata': useraccountdata.data
+        'useraccountdata': useraccountdata.data,
+        'transactiondata': transactiondata.data if transactiondata else None
     }
     return Response(context, status=status.HTTP_200_OK)
 
@@ -285,7 +293,73 @@ def donetransactionsoutward(request):
     return Response(status=status.HTTP_200_OK)
 
 
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def donetransactionbill(request):
+    my_user = request.user
+    my_account = BankAccount.objects.filter(user=my_user).first()
+    transaction_type = get_object_or_404(TransactionType, name='Bill Payment')
+    s = shortuuid.ShortUUID().random(length=20)
+    if request.method == 'POST':
+        pin = request.data.get('pin')
+        phonenumber = request.data.get('phonenumber')
+        Network =  request.data.get('network')
+        amount = request.data.get('amount')
+        narration = request.data.get('narration')
+        pinprofile = Profile.objects.filter(user=my_user).filter(pin=pin).first()
+        if my_account:
+            if pinprofile:
+                debit_amount = Decimal(amount)
+                if my_account.balance >= debit_amount:
+                    debit_bank = 'Billpayment'
+                    if debit_bank:
+                        serializer = PostTransactionsserializer(data={
+                            'sender_bank_account': my_account.id,
+                            'sender_user': my_account.account_name,
+                            'recipient_user': Network,
+                            'transaction_type': transaction_type.id,
+                            'reference': s,
+                            'amount': debit_amount,
+                            'status': 'Completed',
+                            'narration': narration,
+                            'Bank_name': Network,
+                            'Bank_accountnumber': phonenumber,
+                            'is_debit': True,
+                            'is_credit': False
+                        })
+                        if serializer.is_valid():
+                            transaction_instance = serializer.save()
+                            print(transaction_instance)
+                            sender_record = donetransaction.objects.create(
+                                user=my_user,
+                                status='Completed',
+                                transaction=transaction_instance,
+                                amount=debit_amount,
+                                is_debit=True,
+                                is_billpayment=True
+                            )
 
+
+                            my_account.balance = my_account.balance - debit_amount
+                            my_account.save()
+
+                            transaction_serializer = Transactionsserializer(transaction_instance)
+                            return Response(transaction_serializer.data, status=status.HTTP_200_OK)
+
+
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                    else:
+                        return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'detail': 'Insufficient Funds'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'detail': 'Wrong Pin'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_200_OK)
 import json
 
 
