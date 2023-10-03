@@ -1,3 +1,4 @@
+import requests
 import shortuuid
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponse
@@ -187,6 +188,102 @@ def donetransactionss(request):
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
+
+
+def verify_account(account_number, bank_code):
+    paystack_secret_key = 'sk_test_c1f886a70706e4f3e7ae82860d178f6d48a4822c'
+
+    # Create the Paystack verify account endpoint URL
+    verify_url = f"https://api.paystack.co/bank/resolve?account_number={account_number}&bank_code={bank_code}"
+
+    # Make a GET request to the Paystack API
+    headers = {
+        'Authorization': f'Bearer {paystack_secret_key}',
+        'Content-Type': 'application/json',
+    }
+
+    response = requests.get(verify_url, headers=headers)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        data = response.json()
+        print(data)
+        account_name = data.get('data', {}).get('account_name', '')
+        return {'status': 'success', 'account_name': account_name}
+    else:
+        return {'status': 'error', 'message': 'Unable to verify account number'}
+
+
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def donetransactionsoutward(request):
+    my_user = request.user
+    my_account = BankAccount.objects.filter(user=my_user).first()
+    transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
+    s = shortuuid.ShortUUID().random(length=20)
+    if request.method == 'POST':
+        pin = request.data.get('pin')
+        account_number = request.data.get('account_number')
+        bank_code =  request.data.get('bankcode')
+        bank_name =  request.data.get('bankname')
+        amount = request.data.get('amount')
+        narration = request.data.get('narration')
+        pinprofile = Profile.objects.filter(user=my_user).filter(pin=pin).first()
+        if my_account:
+            if pinprofile:
+                debit_amount = Decimal(amount)
+                if my_account.balance >= debit_amount:
+                    debit_bank = verify_account(account_number, bank_code)
+                    if debit_bank:
+                        serializer = PostTransactionsserializer(data={
+                            'sender_bank_account': my_account.id,
+                            'sender_user': my_account.account_name,
+                            'recipient_user': debit_bank.get('account_name', ''),
+                            'transaction_type': transaction_type.id,
+                            'reference': s,
+                            'amount': debit_amount,
+                            'status': 'Completed',
+                            'narration': narration,
+                            'Bank_name': bank_name,
+                            'Bank_accountnumber': account_number,
+                            'is_debit': True,
+                            'is_credit': False
+                        })
+                        if serializer.is_valid():
+                            transaction_instance = serializer.save()
+                            print(transaction_instance)
+                            sender_record = donetransaction.objects.create(
+                                user=my_user,
+                                status='Completed',
+                                transaction=transaction_instance,
+                                amount=debit_amount,
+                                is_debit=True,
+                                is_fundtransfer=True
+                            )
+
+
+                            my_account.balance = my_account.balance - debit_amount
+                            my_account.save()
+
+                            transaction_serializer = Transactionsserializer(transaction_instance)
+                            return Response(transaction_serializer.data, status=status.HTTP_200_OK)
+
+
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                    else:
+                        return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'detail': 'Insufficient Funds'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'detail': 'Wrong Pin'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_200_OK)
+
 
 
 import json
