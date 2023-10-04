@@ -128,3 +128,45 @@ class NetworkDataPlan(models.Model):
     logo = models.ImageField(blank=True, upload_to='networkimg')
     def __str__(self):
         return f"{self.network} Data Plans"
+
+
+class Betting(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Betting Platform"
+
+
+class Transport(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Transport Platform"
+
+
+class Tv(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} TV Platform"
+
+
+class Giftcard(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Giftcard Platform"
+
+
+class Power(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Power Platform"
+
+
+class Education(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Education Platform"

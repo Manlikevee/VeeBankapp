@@ -25,5 +25,8 @@ urlpatterns = [
     path('airtime', import_data_plans, name='import_data_plans'),
     path('outward', donetransactionsoutward, name='donetransactionsoutward'),
     path('donetransactionbill', donetransactionbill, name='donetransactionbill'),
+    path('allbills', allbills, name='allbills'),
+
+
 
 ]

@@ -74,3 +74,24 @@ class NetworkDataPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = NetworkDataPlan
         fields = '__all__'
+
+class BettingnSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Betting
+        fields = '__all__'
+
+class TransportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transport
+        fields = '__all__'
+
+class TvSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tv
+        fields = '__all__'
+
+
+class PowerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Power
+        fields = '__all__'

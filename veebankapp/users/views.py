@@ -10,9 +10,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
-from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan
+from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
+    Transport, Tv, Power
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
-    TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer
+    TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
+    TransportSerializer, TvSerializer, PowerSerializer
 
 
 # Create your views here.
@@ -222,7 +224,6 @@ def verify_account(account_number, bank_code):
         return {'status': 'error', 'message': 'Unable to verify account number'}
 
 
-
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def donetransactionsoutward(request):
@@ -233,8 +234,8 @@ def donetransactionsoutward(request):
     if request.method == 'POST':
         pin = request.data.get('pin')
         account_number = request.data.get('account_number')
-        bank_code =  request.data.get('bankcode')
-        bank_name =  request.data.get('bankname')
+        bank_code = request.data.get('bankcode')
+        bank_name = request.data.get('bankname')
         amount = request.data.get('amount')
         narration = request.data.get('narration')
         pinprofile = Profile.objects.filter(user=my_user).filter(pin=pin).first()
@@ -270,7 +271,6 @@ def donetransactionsoutward(request):
                                 is_fundtransfer=True
                             )
 
-
                             my_account.balance = my_account.balance - debit_amount
                             my_account.save()
 
@@ -303,7 +303,7 @@ def donetransactionbill(request):
     if request.method == 'POST':
         pin = request.data.get('pin')
         phonenumber = request.data.get('phonenumber')
-        Network =  request.data.get('network')
+        Network = request.data.get('network')
         amount = request.data.get('amount')
         narration = request.data.get('narration')
         pinprofile = Profile.objects.filter(user=my_user).filter(pin=pin).first()
@@ -339,7 +339,6 @@ def donetransactionbill(request):
                                 is_billpayment=True
                             )
 
-
                             my_account.balance = my_account.balance - debit_amount
                             my_account.save()
 
@@ -360,6 +359,8 @@ def donetransactionbill(request):
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
+
+
 import json
 
 
@@ -379,6 +380,7 @@ def new_transaction(request):
         return Response({'detail': 'Success'}, status=status.HTTP_200_OK)
 
     return Response({'detail': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 @api_view(['POST', 'GET'])
 def import_data_plans(request):
@@ -467,3 +469,23 @@ def import_data_plans(request):
     queryset = NetworkDataPlan.objects.all()
     serializer_class = NetworkDataPlanSerializer(queryset, many=True)
     return Response(serializer_class.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST', 'GET'])
+def allbills(request):
+    qs2 = Betting.objects.all()
+    bettngdata = BettingnSerializer(qs2, many=True)
+    trans = Transport.objects.all()
+    transdata = TransportSerializer(trans, many=True)
+    tvseries = Tv.objects.all()
+    tvdata = TvSerializer(tvseries, many=True)
+    powers = Power.objects.all()
+    powerdata = PowerSerializer(powers, many=True)
+    response_data = {
+        'betting': bettngdata.data,
+        'transport': transdata.data,
+        'tv': tvdata.data,
+        'power': powerdata.data
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
