@@ -471,6 +471,8 @@ def import_data_plans(request):
     return Response(serializer_class.data, status=status.HTTP_200_OK)
 
 
+
+
 @api_view(['POST', 'GET'])
 def allbills(request):
     qs2 = Betting.objects.all()
