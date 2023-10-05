@@ -475,6 +475,8 @@ def import_data_plans(request):
 
 @api_view(['POST', 'GET'])
 def allbills(request):
+    queryset = NetworkDataPlan.objects.all()
+    serializer_class = NetworkDataPlanSerializer(queryset, many=True)
     qs2 = Betting.objects.all()
     bettngdata = BettingnSerializer(qs2, many=True)
     trans = Transport.objects.all()
@@ -487,7 +489,8 @@ def allbills(request):
         'betting': bettngdata.data,
         'transport': transdata.data,
         'tv': tvdata.data,
-        'power': powerdata.data
+        'power': powerdata.data,
+        'airtime': serializer_class.data
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
