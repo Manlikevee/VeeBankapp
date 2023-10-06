@@ -500,6 +500,7 @@ def allbills(request):
 def creditanddebit(request):
     user = request.user
     usercredits = donetransaction.objects.filter(is_credit=True).filter(user=user).all()
+    userstransactions = donetransaction.objects.filter(user=user).all()
     usercredit = Donetransaction(usercredits, many=True)
     userdebits = donetransaction.objects.filter(is_debit=True).filter(user=user).all()
     userdebit = Donetransaction(userdebits, many=True)
@@ -507,11 +508,13 @@ def creditanddebit(request):
         Sum('amount'))
     userdebitbalance = donetransaction.objects.filter(is_debit=True).filter(user=user).all().aggregate(
         Sum('amount'))
+    userstransaction = Donetransaction(userstransactions, many=True)
     context = {
         'usercreditbalance': usercreditbalance,
         'userdebitbalance': userdebitbalance,
         'usercreditdata': usercredit.data,
         'userdebit': userdebit.data,
+        'userstransaction': userstransaction.data
 
     }
     return Response(context, status=status.HTTP_200_OK)
