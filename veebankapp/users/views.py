@@ -501,6 +501,7 @@ def creditanddebit(request):
     user = request.user
     usercredits = donetransaction.objects.filter(is_credit=True).filter(user=user).all()
     userstransactions = donetransaction.objects.filter(user=user).all()
+
     usercredit = Donetransaction(usercredits, many=True)
     userdebits = donetransaction.objects.filter(is_debit=True).filter(user=user).all()
     userdebit = Donetransaction(userdebits, many=True)
