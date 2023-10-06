@@ -170,3 +170,10 @@ class Education(models.Model):
     logo = models.ImageField(blank=True, upload_to='networkimg')
     def __str__(self):
         return f"{self.network} Education Platform"
+
+
+class Utilty(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='networkimg')
+    def __str__(self):
+        return f"{self.network} Education Platform"

@@ -1,6 +1,7 @@
 import requests
 import shortuuid
 from django.contrib.auth.models import User
+from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
@@ -471,8 +472,6 @@ def import_data_plans(request):
     return Response(serializer_class.data, status=status.HTTP_200_OK)
 
 
-
-
 @api_view(['POST', 'GET'])
 def allbills(request):
     queryset = NetworkDataPlan.objects.all()
@@ -494,3 +493,25 @@ def allbills(request):
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def creditanddebit(request):
+    user = request.user
+    usercredits = donetransaction.objects.filter(is_credit=True).filter(user=user).all()
+    usercredit = Donetransaction(usercredits, many=True)
+    userdebits = donetransaction.objects.filter(is_debit=True).filter(user=user).all()
+    userdebit = Donetransaction(userdebits, many=True)
+    usercreditbalance = donetransaction.objects.filter(is_credit=True).filter(user=user).all().aggregate(
+        Sum('amount'))
+    userdebitbalance = donetransaction.objects.filter(is_debit=True).filter(user=user).all().aggregate(
+        Sum('amount'))
+    context = {
+        'usercreditbalance': usercreditbalance,
+        'userdebitbalance': userdebitbalance,
+        'usercreditdata': usercredit.data,
+        'userdebit': userdebit.data,
+
+    }
+    return Response(context, status=status.HTTP_200_OK)

@@ -26,6 +26,7 @@ urlpatterns = [
     path('outward', donetransactionsoutward, name='donetransactionsoutward'),
     path('donetransactionbill', donetransactionbill, name='donetransactionbill'),
     path('allbills', allbills, name='allbills'),
+    path('creditanddebit', creditanddebit, name='creditanddebit'),
 
 
 
