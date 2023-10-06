@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from faker import Faker
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
@@ -12,10 +13,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
-    Transport, Tv, Power
+    Transport, Tv, Power, ATMCard
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
-    TransportSerializer, TvSerializer, PowerSerializer
+    TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer
 
 
 # Create your views here.
@@ -519,3 +520,37 @@ def creditanddebit(request):
 
     }
     return Response(context, status=status.HTTP_200_OK)
+
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def generate_single_atm_card(request):
+    user = User.objects.filter(id=1).first()
+    card = ATMCard.objects.filter(user=user).first()
+
+    if card:
+        # If the user already has a card, return its details
+        serializer = ATMCardSerializer(card)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        # If the user doesn't have a card, generate one using Faker
+        fake = Faker()
+        card_type = fake.credit_card_provider()
+        card_number = fake.credit_card_number(card_type=None)
+        expiry_date = fake.credit_card_expire(start="now", end="+10y", date_format="%m/%y")
+        ccv = fake.credit_card_security_code(card_type=None)
+
+        # Create a new ATM card for the user
+        card = ATMCard.objects.create(
+            user=user,  # Assuming 'user' is the ForeignKey field
+            card_type=card_type,
+            card_number=card_number,
+            expiry_date=expiry_date,
+            ccv=ccv,
+        )
+
+        serializer = ATMCardSerializer(card)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+

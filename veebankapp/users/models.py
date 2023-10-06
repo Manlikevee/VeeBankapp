@@ -177,3 +177,14 @@ class Utilty(models.Model):
     logo = models.ImageField(blank=True, upload_to='networkimg')
     def __str__(self):
         return f"{self.network} Education Platform"
+
+
+class ATMCard(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    card_type = models.CharField(max_length=255 , null=True, blank=True)
+    card_number = models.CharField(max_length=16 , null=True, blank=True)
+    expiry_date = models.CharField(max_length=5 , null=True, blank=True)
+    ccv = models.CharField(max_length=4 , null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.card_type} - {self.card_number}"

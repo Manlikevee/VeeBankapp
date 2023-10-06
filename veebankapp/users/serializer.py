@@ -95,3 +95,9 @@ class PowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Power
         fields = '__all__'
+
+
+class ATMCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ATMCard
+        fields = '__all__'
