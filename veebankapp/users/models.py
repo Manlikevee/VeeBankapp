@@ -2,11 +2,15 @@ from django.contrib.auth.models import User
 from django.db import models
 import shortuuid
 from django.db.models import JSONField
-
+import random
 s = shortuuid.ShortUUID().random(length=10)
 
 
 # Create your models here.
+class AvailableImage(models.Model):
+    image = models.ImageField(upload_to='available_images/')
+    def __str__(self):
+        return f" img Platform"
 
 
 class Profile(models.Model):
@@ -33,10 +37,15 @@ class Profile(models.Model):
     account_number = models.CharField(max_length=20, unique=True, blank=True, null=True, default=None)
     balance = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
     profilephoto = models.ImageField(blank=True, default='default.jpg', upload_to='profile_images')
+    profile_image = models.ForeignKey(AvailableImage, on_delete=models.SET_NULL, null=True, blank=True)
+
     # Add other fields as needed, and set them as blank=True and null=True
     def save(self, *args, **kwargs):
         if not self.account_number:
             self.account_number = s
+        if not self.profile_image:
+            random_image = random.choice(AvailableImage.objects.all())
+            self.profile_image = random_image
         super().save(*args, **kwargs)
 
     def __str__(self):

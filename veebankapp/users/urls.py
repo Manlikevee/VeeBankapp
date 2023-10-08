@@ -30,6 +30,8 @@ urlpatterns = [
     path('generate_single_atm_card/', generate_single_atm_card, name='generate_single_atm_card'),
     path('registration/', RegistrationView.as_view(), name='registration'),
     path('veebankregister/', UserRegistrationView.as_view(), name='user-registration'),
-
+    path('imgtext/', imgtext, name='user-imgtext'),
+    path('setpinandprofile/', setpinandprofile, name='setpinandprofile'),
+    path('AvailableImages/', AvailableImages, name='AvailableImages'),
 
 ]

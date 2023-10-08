@@ -13,11 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
-    Transport, Tv, Power, ATMCard, Giftcard, Education
+    Transport, Tv, Power, ATMCard, Giftcard, Education, AvailableImage
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
     TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer, \
-    Userserializer, UserRegistrationSerializer
+    Userserializer, UserRegistrationSerializer, AvailableImageSerializer
 
 
 # Create your views here.
@@ -362,6 +362,72 @@ def donetransactionbill(request):
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def donetransactionbill(request):
+    my_user = request.user
+    my_account = BankAccount.objects.filter(user=my_user).first()
+    transaction_type = get_object_or_404(TransactionType, name='Bill Payment')
+    s = shortuuid.ShortUUID().random(length=20)
+    if request.method == 'POST':
+        pin = request.data.get('pin')
+        phonenumber = request.data.get('phonenumber')
+        Network = request.data.get('network')
+        amount = request.data.get('amount')
+        narration = request.data.get('narration')
+        pinprofile = Profile.objects.filter(user=my_user).filter(pin=pin).first()
+        if my_account:
+            if pinprofile:
+                debit_amount = Decimal(amount)
+                if my_account.balance >= debit_amount:
+                    debit_bank = 'Billpayment'
+                    if debit_bank:
+                        serializer = PostTransactionsserializer(data={
+                            'sender_bank_account': my_account.id,
+                            'sender_user': my_account.account_name,
+                            'recipient_user': Network,
+                            'transaction_type': transaction_type.id,
+                            'reference': s,
+                            'amount': debit_amount,
+                            'status': 'Completed',
+                            'narration': narration,
+                            'Bank_name': Network,
+                            'Bank_accountnumber': phonenumber,
+                            'is_debit': True,
+                            'is_credit': False
+                        })
+                        if serializer.is_valid():
+                            transaction_instance = serializer.save()
+                            print(transaction_instance)
+                            sender_record = donetransaction.objects.create(
+                                user=my_user,
+                                status='Completed',
+                                transaction=transaction_instance,
+                                amount=debit_amount,
+                                is_debit=True,
+                                is_billpayment=True
+                            )
+
+                            my_account.balance = my_account.balance - debit_amount
+                            my_account.save()
+
+                            transaction_serializer = Transactionsserializer(transaction_instance)
+                            return Response(transaction_serializer.data, status=status.HTTP_200_OK)
+
+
+                        else:
+                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                    else:
+                        return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({'detail': 'Insufficient Funds'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'detail': 'Wrong Pin'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_200_OK)
 
 
 import json
@@ -617,3 +683,40 @@ class UserRegistrationView(APIView):
             return Response({'message': 'User registered successfully'},
                             status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+def imgtext(request):
+    likke = Profile.objects.filter(id=7).first()
+    likke.profilephoto = 'https://res.cloudinary.com/viktortech/image/upload/v1/media/networkimg/image_original4_uypyxl'
+    likke.save()
+@api_view([ 'GET'])
+def AvailableImages(request):
+    avail = AvailableImage.objects.all()
+    availdata = AvailableImageSerializer(avail,  many=True)
+
+    context = {
+        'availdatas': availdata.data,
+
+    }
+    return Response(context, status=status.HTTP_200_OK)
+
+@api_view(['POST', 'GET'])
+def setpinandprofile(request):
+    my_user = User.objects.filter(id=9).first()
+    myprofile = Profile.objects.filter(user=my_user).first()
+    user_Accountdetials, created = BankAccount.objects.get_or_create(user=my_user)
+    my_account = BankAccount.objects.filter(user=my_user).first()
+    if request.method == 'POST':
+        pin = request.data.get('pin')
+        selectedimg = request.data.get('imgid')
+
+        selectedimage = AvailableImage.objects.filter(id=selectedimg).first()
+        if not myprofile.is_verified:
+            myprofile.profile_image = selectedimage
+            myprofile.pin = pin
+            myprofile.save()
+        else:
+            return Response({'detail': 'Profile Already Set'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_200_OK)
