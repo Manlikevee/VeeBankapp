@@ -17,7 +17,7 @@ from users.models import Profile, Transaction, BankAccount, TransactionType, don
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
     TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer, \
-    Userserializer
+    Userserializer, UserRegistrationSerializer
 
 
 # Create your views here.
@@ -586,3 +586,34 @@ def registration(request):
 
         return Response({'success': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserRegistrationView(APIView):
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            email = serializer.validated_data['email']
+            firstname = serializer.validated_data['first_name']
+            lastname = serializer.validated_data['last_name']
+            password = serializer.validated_data['password']
+
+            # Check if the username or email already exists
+            if User.objects.filter(username=username).filter(email=email).exists():
+                return Response({'error': 'User with Username and Email already exists'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            if User.objects.filter(username=username).exists():
+                return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            if User.objects.filter(email=email).exists():
+                return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create the user
+            user = serializer.save()
+
+            return Response({'message': 'User registered successfully'},
+                            status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
