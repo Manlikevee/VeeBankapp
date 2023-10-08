@@ -362,6 +362,8 @@ def donetransactionbill(request):
             return Response({'detail': 'Account Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
+
+
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def donetransactionbill(request):
@@ -685,15 +687,14 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 def imgtext(request):
     likke = Profile.objects.filter(id=7).first()
     likke.profilephoto = 'https://res.cloudinary.com/viktortech/image/upload/v1/media/networkimg/image_original4_uypyxl'
     likke.save()
 
-@api_view([ 'GET'])
-def AvailableImages(request):
 
+@api_view(['GET'])
+def AvailableImages(request):
     s = shortuuid.ShortUUID(alphabet="0123456789")
     accno = s.random(length=10)
 
@@ -704,7 +705,7 @@ def AvailableImages(request):
         defaults={"account_number": accno, "account_name": my_accountname}
     )
     avail = AvailableImage.objects.all()
-    availdata = AvailableImageSerializer(avail,  many=True)
+    availdata = AvailableImageSerializer(avail, many=True)
 
     context = {
         'availdatas': availdata.data,
@@ -725,7 +726,7 @@ def setpinandprofile(request):
 
     # Assuming you have the user ID in the request data, change '9' to the actual user ID.
     user_id = 9
-    my_user = User.objects.filter(id=user_id).first()
+    my_user = request.user
 
     # Ensure the user exists before proceeding
     if not my_user:
