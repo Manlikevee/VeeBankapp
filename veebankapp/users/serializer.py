@@ -101,3 +101,21 @@ class ATMCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = ATMCard
         fields = '__all__'
+
+
+class NetworkDataPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NetworkDataPlan
+        fields = '__all__'
+
+
+class GiftcardPlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Giftcard
+        fields = '__all__'
+
+
+class EducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Education
+        fields = '__all__'

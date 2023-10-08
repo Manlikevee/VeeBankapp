@@ -13,10 +13,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
-    Transport, Tv, Power, ATMCard
+    Transport, Tv, Power, ATMCard, Giftcard, Education
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
-    TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer
+    TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer
 
 
 # Create your views here.
@@ -485,12 +485,18 @@ def allbills(request):
     tvdata = TvSerializer(tvseries, many=True)
     powers = Power.objects.all()
     powerdata = PowerSerializer(powers, many=True)
+    giftcard = Giftcard.objects.all()
+    gift = GiftcardPlanSerializer(giftcard, many=True)
+    edu = Education.objects.all()
+    education = EducationSerializer(edu, many=True)
     response_data = {
         'betting': bettngdata.data,
         'transport': transdata.data,
         'tv': tvdata.data,
         'power': powerdata.data,
-        'airtime': serializer_class.data
+        'airtime': serializer_class.data,
+        'giftcards': gift.data,
+        'educations': education.data
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
