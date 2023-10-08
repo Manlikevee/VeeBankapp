@@ -490,6 +490,7 @@ def allbills(request):
     edu = Education.objects.all()
     education = EducationSerializer(edu, many=True)
     response_data = {
+
         'betting': bettngdata.data,
         'transport': transdata.data,
         'tv': tvdata.data,
