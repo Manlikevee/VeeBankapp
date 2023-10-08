@@ -561,14 +561,16 @@ def generate_single_atm_card(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-@api_view(['POST'])
-def registration(request):
-    if request.method == 'POST':
-        username = request.data.get['username']
-        email = request.data.get['email']
-        firstname = request.data.get['first_name']
-        lastname = request.data.get['last_name']
-        password = request.data.get['password']
+class RegistrationView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        firstname = request.data.get('first_name')
+        lastname = request.data.get('last_name')
+        password = request.data.get('password')
+
+        if not (username and email and firstname and lastname and password):
+            return Response({'error': 'Please fill in all fields.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -586,7 +588,6 @@ def registration(request):
         )
 
         return Response({'success': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_201_CREATED)
 
 
 class UserRegistrationView(APIView):
