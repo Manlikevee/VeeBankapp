@@ -162,7 +162,7 @@ def donetransactionss(request):
                         if serializer.is_valid():
                             recipient_user = User.objects.get(username=debit_bank.user.username)
                             transaction_instance = serializer.save()
-                            print(transaction_instance)
+
                             sender_record = donetransaction.objects.create(
                                 user=my_user,
                                 status='Completed',
@@ -715,15 +715,17 @@ def AvailableImages(request):
 
 @api_view(['POST', 'GET'])
 def setpinandprofile(request):
+    transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
     if request.method == 'GET':
         return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     s = shortuuid.ShortUUID(alphabet="0123456789")
     accno = s.random(length=10)
+    sap = s.random(length=16)
 
     # Assuming you have the user ID in the request data, change '9' to the actual user ID.
     user_id = 9
-    my_user = request.user
+    my_user = User.objects.filter(id=user_id).first()
 
     # Ensure the user exists before proceeding
     if not my_user:
@@ -748,6 +750,38 @@ def setpinandprofile(request):
             myprofile.pin = pin
             myprofile.is_verified = True  # Assuming you want to mark the profile as verified
             myprofile.save()
+            serializer = PostTransactionsserializer(data={
+
+                'recipient_bank_account': my_account.id,
+                'recipient_user': my_account.account_name,
+                'transaction_type': transaction_type.id,
+                'reference': sap,
+                'amount': 300000,
+                'status': 'Completed',
+                'narration': 'SIGNON BONUS',
+                'Bank_name': 'Vee Bank',
+                'Bank_accountnumber': my_account.account_number,
+                'is_debit': False,
+                'is_credit': True
+            })
+
+            if serializer.is_valid():
+                recipient_user = request.user
+                transaction_instance = serializer.save()
+
+                sender_record = donetransaction.objects.create(
+                    user=my_user,
+                    status='Completed',
+                    transaction=transaction_instance,
+                    amount=300000,
+                    is_credit=True,
+                    is_fundtransfer=True
+                )
+                my_account.balance = my_account.balance + 300000
+                my_account.save()
+
+                transaction_serializer = Transactionsserializer(transaction_instance)
+                return Response(transaction_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Profile Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
