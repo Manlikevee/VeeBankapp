@@ -693,9 +693,16 @@ def imgtext(request):
 
 @api_view([ 'GET'])
 def AvailableImages(request):
+
+    s = shortuuid.ShortUUID(alphabet="0123456789")
+    accno = s.random(length=10)
+
     my_user = request.user
     my_accountname = f"{my_user.first_name} {my_user.last_name}"
-    myprofile, created = Profile.objects.get_or_create(user=my_user)
+    my_account, created = BankAccount.objects.get_or_create(
+        user=my_user,
+        defaults={"account_number": accno, "account_name": my_accountname}
+    )
     avail = AvailableImage.objects.all()
     availdata = AvailableImageSerializer(avail,  many=True)
 
