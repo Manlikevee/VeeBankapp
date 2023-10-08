@@ -690,8 +690,12 @@ def imgtext(request):
     likke = Profile.objects.filter(id=7).first()
     likke.profilephoto = 'https://res.cloudinary.com/viktortech/image/upload/v1/media/networkimg/image_original4_uypyxl'
     likke.save()
+
 @api_view([ 'GET'])
 def AvailableImages(request):
+    my_user = request.user
+    my_accountname = f"{my_user.first_name} {my_user.last_name}"
+    myprofile, created = Profile.objects.get_or_create(user=my_user)
     avail = AvailableImage.objects.all()
     availdata = AvailableImageSerializer(avail,  many=True)
 
@@ -712,7 +716,7 @@ def setpinandprofile(request):
 
     # Assuming you have the user ID in the request data, change '9' to the actual user ID.
     user_id = 9
-    my_user = User.objects.filter(id=user_id).first()
+    my_user = request.user
 
     # Ensure the user exists before proceeding
     if not my_user:
