@@ -17,9 +17,11 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.update_or_create(user=instance,
                                          defaults={'user': instance, "auth_token": otp})
-
+        my_accountname = f"{instance.first_name} {instance.last_name}"
         BankAccount.objects.update_or_create(user=instance,
-                                             defaults={'user': instance, "account_number": accno})
+                                             defaults={'user': instance, "account_number": accno,
+                                                       "account_name": my_accountname
+                                                       })
 
         card_type = fake.credit_card_provider()
         card_number = fake.credit_card_number(card_type=None)

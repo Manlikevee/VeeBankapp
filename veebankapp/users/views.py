@@ -701,22 +701,43 @@ def AvailableImages(request):
     }
     return Response(context, status=status.HTTP_200_OK)
 
+
 @api_view(['POST', 'GET'])
 def setpinandprofile(request):
-    my_user = User.objects.filter(id=9).first()
-    myprofile = Profile.objects.filter(user=my_user).first()
-    user_Accountdetials, created = BankAccount.objects.get_or_create(user=my_user)
-    my_account = BankAccount.objects.filter(user=my_user).first()
+    if request.method == 'GET':
+        return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    s = shortuuid.ShortUUID(alphabet="0123456789")
+    accno = s.random(length=10)
+
+    # Assuming you have the user ID in the request data, change '9' to the actual user ID.
+    user_id = 9
+    my_user = User.objects.filter(id=user_id).first()
+
+    # Ensure the user exists before proceeding
+    if not my_user:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    my_accountname = f"{my_user.first_name} {my_user.last_name}"
+    myprofile, created = Profile.objects.get_or_create(user=my_user)
+
+    my_account, created = BankAccount.objects.get_or_create(
+        user=my_user,
+        defaults={"account_number": accno, "account_name": my_accountname}
+    )
+
     if request.method == 'POST':
         pin = request.data.get('pin')
         selectedimg = request.data.get('imgid')
 
         selectedimage = AvailableImage.objects.filter(id=selectedimg).first()
+
         if not myprofile.is_verified:
             myprofile.profile_image = selectedimage
             myprofile.pin = pin
+            myprofile.is_verified = True  # Assuming you want to mark the profile as verified
             myprofile.save()
         else:
             return Response({'detail': 'Profile Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response(status=status.HTTP_200_OK)
+    return Response({'detail': 'Profile and PIN updated successfully'}, status=status.HTTP_200_OK)
