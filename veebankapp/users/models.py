@@ -32,7 +32,7 @@ class Profile(models.Model):
     pin = models.PositiveIntegerField(max_length=4, default=1234)
     account_number = models.CharField(max_length=20, unique=True, blank=True, null=True, default=None)
     balance = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
-
+    profilephoto = models.ImageField(blank=True, default='default.jpg', upload_to='profile_images')
     # Add other fields as needed, and set them as blank=True and null=True
     def save(self, *args, **kwargs):
         if not self.account_number:
