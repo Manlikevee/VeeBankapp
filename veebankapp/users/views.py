@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_jwt.views import obtain_jwt_token
+
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
     Transport, Tv, Power, ATMCard, Giftcard, Education
@@ -583,8 +583,6 @@ def registration(request):
             password=serializer.validated_data['password']
         )
 
-        # Generate JWT tokens
-        token = obtain_jwt_token(user)  # This function generates the token for the user
 
-        return Response({'access': token['token'], 'refresh': token['refresh'], 'success': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
+        return Response({'success': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
