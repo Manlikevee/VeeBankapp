@@ -530,7 +530,6 @@ def creditanddebit(request):
     return Response(context, status=status.HTTP_200_OK)
 
 
-
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
 def generate_single_atm_card(request):
@@ -564,12 +563,13 @@ def generate_single_atm_card(request):
 
 @api_view(['POST'])
 def registration(request):
-    serializer = Userserializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.validated_data['username']
-        email = serializer.validated_data['email']
+    if request.method == 'POST':
+        username = request.data.get['username']
+        email = request.data.get['email']
+        firstname = request.data.get['first_name']
+        lastname = request.data.get['last_name']
+        password = request.data.get['password']
 
-        # Check if username or email already exists
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -580,12 +580,13 @@ def registration(request):
         user = User.objects.create_user(
             username=username,
             email=email,
-            password=serializer.validated_data['password']
+            password=password,
+            first_name=firstname,
+            last_name=lastname
         )
 
-
         return Response({'success': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_201_CREATED)
 
 
 class UserRegistrationView(APIView):
@@ -615,5 +616,3 @@ class UserRegistrationView(APIView):
             return Response({'message': 'User registered successfully'},
                             status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
