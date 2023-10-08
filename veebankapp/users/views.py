@@ -724,8 +724,6 @@ def setpinandprofile(request):
     accno = s.random(length=10)
     sap = s.random(length=16)
 
-    # Assuming you have the user ID in the request data, change '9' to the actual user ID.
-    user_id = 9
     my_user = request.user
 
     # Ensure the user exists before proceeding
