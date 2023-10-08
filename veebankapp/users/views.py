@@ -10,13 +10,14 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework_jwt.views import obtain_jwt_token
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
     Transport, Tv, Power, ATMCard, Giftcard, Education
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
-    TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer
+    TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer, \
+    Userserializer
 
 
 # Create your views here.
@@ -561,3 +562,29 @@ def generate_single_atm_card(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+@api_view(['POST'])
+def registration(request):
+    serializer = Userserializer(data=request.data)
+    if serializer.is_valid():
+        username = serializer.validated_data['username']
+        email = serializer.validated_data['email']
+
+        # Check if username or email already exists
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(email=email).exists():
+            return Response({'error': 'Email already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create a new user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=serializer.validated_data['password']
+        )
+
+        # Generate JWT tokens
+        token = obtain_jwt_token(user)  # This function generates the token for the user
+
+        return Response({'access': token['token'], 'refresh': token['refresh'], 'success': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
