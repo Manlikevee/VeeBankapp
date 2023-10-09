@@ -13,11 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
-    Transport, Tv, Power, ATMCard, Giftcard, Education, AvailableImage
+    Transport, Tv, Power, ATMCard, Giftcard, Education, AvailableImage, Music
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
     TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer, \
-    Userserializer, UserRegistrationSerializer, AvailableImageSerializer
+    Userserializer, UserRegistrationSerializer, AvailableImageSerializer, MusicSerializer
 
 
 # Create your views here.
@@ -544,6 +544,8 @@ def import_data_plans(request):
 
 @api_view(['POST', 'GET'])
 def allbills(request):
+    musicdata =  Music.objects.all()
+    serializedmusic = MusicSerializer(musicdata, many=True)
     queryset = NetworkDataPlan.objects.all()
     serializer_class = NetworkDataPlanSerializer(queryset, many=True)
     qs2 = Betting.objects.all()
@@ -566,7 +568,8 @@ def allbills(request):
         'power': powerdata.data,
         'airtime': serializer_class.data,
         'giftcards': gift.data,
-        'educations': education.data
+        'educations': education.data,
+        'music': serializedmusic.data
     }
 
     return Response(response_data, status=status.HTTP_200_OK)

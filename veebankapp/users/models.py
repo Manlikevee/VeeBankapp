@@ -181,6 +181,12 @@ class Education(models.Model):
         return f"{self.network} Education Platform"
 
 
+class Music(models.Model):
+    network = models.CharField(max_length=50)
+    logo = models.ImageField(blank=True, upload_to='music')
+    def __str__(self):
+        return f"{self.network} music Platform"
+
 class Utilty(models.Model):
     network = models.CharField(max_length=50)
     logo = models.ImageField(blank=True, upload_to='networkimg')

@@ -77,9 +77,9 @@ class Donetransaction(serializers.ModelSerializer):
         fields = '__all__'  # Or specify the fields you want to expose
 
 
-class NetworkDataPlanSerializer(serializers.ModelSerializer):
+class MusicSerializer(serializers.ModelSerializer):
     class Meta:
-        model = NetworkDataPlan
+        model = Music
         fields = '__all__'
 
 
