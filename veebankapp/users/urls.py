@@ -33,5 +33,7 @@ urlpatterns = [
     path('imgtext/', imgtext, name='user-imgtext'),
     path('setpinandprofile/', setpinandprofile, name='setpinandprofile'),
     path('AvailableImages/', AvailableImages, name='AvailableImages'),
+    path('Savebeneficiary/', Savebeneficiary, name='Savebeneficary'),
+
 
 ]

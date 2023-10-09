@@ -136,3 +136,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name']
         extra_kwargs = {'password': {'write_only': True}}
+
+
+class BeneficarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Beneficary
+        fields = '__all__'
+

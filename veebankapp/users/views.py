@@ -13,11 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.Forms import TransactionFormSerializer
 from users.models import Profile, Transaction, BankAccount, TransactionType, donetransaction, NetworkDataPlan, Betting, \
-    Transport, Tv, Power, ATMCard, Giftcard, Education, AvailableImage, Music
+    Transport, Tv, Power, ATMCard, Giftcard, Education, AvailableImage, Music, Beneficary
 from users.serializer import Completeprofile, Transactionsserializer, BankAccountserializer, Donetransaction, \
     TransactionTypeserializer, PostTransactionsserializer, NetworkDataPlanSerializer, BettingnSerializer, \
     TransportSerializer, TvSerializer, PowerSerializer, ATMCardSerializer, GiftcardPlanSerializer, EducationSerializer, \
-    Userserializer, UserRegistrationSerializer, AvailableImageSerializer, MusicSerializer
+    Userserializer, UserRegistrationSerializer, AvailableImageSerializer, MusicSerializer, BeneficarySerializer
 
 
 # Create your views here.
@@ -544,7 +544,7 @@ def import_data_plans(request):
 
 @api_view(['POST', 'GET'])
 def allbills(request):
-    musicdata =  Music.objects.all()
+    musicdata = Music.objects.all()
     serializedmusic = MusicSerializer(musicdata, many=True)
     queryset = NetworkDataPlan.objects.all()
     serializer_class = NetworkDataPlanSerializer(queryset, many=True)
@@ -697,6 +697,7 @@ def imgtext(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def AvailableImages(request):
     s = shortuuid.ShortUUID(alphabet="0123456789")
     accno = s.random(length=10)
@@ -717,6 +718,7 @@ def AvailableImages(request):
     return Response(context, status=status.HTTP_200_OK)
 
 
+@permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
 def setpinandprofile(request):
     transaction_type = get_object_or_404(TransactionType, name='Fund Transfer')
@@ -788,3 +790,41 @@ def setpinandprofile(request):
             return Response({'detail': 'Profile Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response({'detail': 'Profile and PIN updated successfully'}, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
+def Savebeneficiary(request):
+    if request.method == 'GET':
+        return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    my_user = User.objects.filter(id=9).first()
+
+    # Ensure the user exists before proceeding
+    if not my_user:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'POST':
+        bank = request.data.get('bank')
+        bankcode = request.data.get('bankcode')
+        accountno = request.data.get('accountnumber')
+        account_name = request.data.get('accountname')
+
+        new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
+
+        if not new_beneficiary:
+            serializer = BeneficarySerializer(data={
+                'account_number': accountno,
+                'account_name': account_name,
+                'bank': bank,
+                'bank_code': bankcode,
+                'user': my_user.id
+            })
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_200_OK)
