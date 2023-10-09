@@ -22,8 +22,15 @@ class Userserializer(serializers.ModelSerializer):
         fields = ['username', 'first_name', 'last_name', 'email', 'id']  # Or specify the fields you want to expose
 
 
+class AvailableImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AvailableImage
+        fields = '__all__'
+
+
 class Completeprofile(serializers.ModelSerializer):
     user = Userserializer()
+    profile_image = AvailableImageSerializer()
 
     class Meta:
         model = Profile
@@ -59,7 +66,7 @@ class PostTransactionsserializer(serializers.ModelSerializer):
         model = Transaction
         fields = ['sender_bank_account', 'recipient_bank_account', 'sender_user', 'recipient_user', 'transaction_type',
                   'reference', 'amount', 'status', 'narration', 'Bank_name', 'Bank_accountnumber', 'is_debit',
-                  'is_credit',  'created_at']
+                  'is_credit', 'created_at']
 
 
 class Donetransaction(serializers.ModelSerializer):
@@ -75,15 +82,18 @@ class NetworkDataPlanSerializer(serializers.ModelSerializer):
         model = NetworkDataPlan
         fields = '__all__'
 
+
 class BettingnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Betting
         fields = '__all__'
 
+
 class TransportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transport
         fields = '__all__'
+
 
 class TvSerializer(serializers.ModelSerializer):
     class Meta:
@@ -121,18 +131,8 @@ class EducationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class UserRegistrationSerializer(serializers.ModelSerializer):
-
-
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name']
         extra_kwargs = {'password': {'write_only': True}}
-
-
-class AvailableImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AvailableImage
-        fields = '__all__'
-
