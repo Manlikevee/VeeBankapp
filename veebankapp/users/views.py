@@ -750,14 +750,14 @@ def setpinandprofile(request):
             myprofile.is_verified = True  # Assuming you want to mark the profile as verified
             myprofile.save()
             serializer = PostTransactionsserializer(data={
-
+                'sender_user': 'VeeBank',
                 'recipient_bank_account': my_account.id,
                 'recipient_user': my_account.account_name,
                 'transaction_type': transaction_type.id,
                 'reference': sap,
                 'amount': 300000,
                 'status': 'Completed',
-                'narration': 'SIGNON BONUS',
+                'narration': 'SIGN ON BONUS',
                 'Bank_name': 'Vee Bank',
                 'Bank_accountnumber': my_account.account_number,
                 'is_debit': False,
