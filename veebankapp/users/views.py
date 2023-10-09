@@ -797,7 +797,8 @@ def Savebeneficiary(request):
     if request.method == 'GET':
         return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    my_user = User.objects.filter(id=9).first()
+
+    my_user = request.user
 
     # Ensure the user exists before proceeding
     if not my_user:
@@ -828,3 +829,16 @@ def Savebeneficiary(request):
             return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view([ 'GET'])
+@permission_classes([IsAuthenticated])
+def getbeneficary(request):
+    my_user = request.user
+    new_beneficiary = Beneficary.objects.filter(user=my_user).all()
+    mybeneficarydata = BeneficarySerializer(new_beneficiary, many=True)
+
+    context = {
+        'mybeneficary': mybeneficarydata.data,
+    }
+    return Response(context, status=status.HTTP_200_OK)

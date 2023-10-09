@@ -34,6 +34,6 @@ urlpatterns = [
     path('setpinandprofile/', setpinandprofile, name='setpinandprofile'),
     path('AvailableImages/', AvailableImages, name='AvailableImages'),
     path('Savebeneficiary/', Savebeneficiary, name='Savebeneficary'),
-
+    path('getbeneficary/', getbeneficary, name='getbeneficary'),
 
 ]
