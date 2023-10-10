@@ -812,20 +812,17 @@ def Savebeneficiary(request):
 
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
         if not new_beneficiary:
-            serializer = BeneficarySerializer(data={
-                'account_number': accountno,
-                'account_name': account_name,
-                'bank': bank,
-                'bank_code': bankcode,
-                'user': my_user.id,
-                'is_external': True,
+            sender_record = Beneficary.objects.create(
+                user=my_user,
+                account_number=accountno,  # Use '=' for field assignment
+                account_name=account_name,  # Use '=' for field assignment
+                bank=bank,
+                bank_code=bankcode,
+                is_external=True,  # Use 'True' with an uppercase 'T'
+            )
 
-            })
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            sender_record.save()
+            return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -850,20 +847,17 @@ def Savebeneficiarytwo(request):
 
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
         if not new_beneficiary:
-            serializer = BeneficarySerializer(data={
-                'account_number': accountno,
-                'account_name': account_name,
-                'bank': 'Vee Bank',
-                'bank_code': '001',
-                'user': my_user.id,
-                'is_internal': True,
+            sender_record = Beneficary.objects.create(
+                user=my_user,
+                account_number=accountno,  # Use '=' for field assignment
+                account_name=account_name,  # Use '=' for field assignment
+                bank='Vee Bank',
+                bank_code='001',
+                is_internal=True,  # Use 'True' with an uppercase 'T'
+            )
 
-            })
-            if serializer.is_valid():
-                serializer.save()
-                return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            sender_record.save()
+            return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
