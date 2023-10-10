@@ -207,11 +207,10 @@ class ATMCard(models.Model):
 
 class Beneficary(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    account_number = models.CharField(max_length=11, unique=True)
+    account_number = models.CharField(max_length=11, unique=False)
     account_name = models.CharField(max_length=90, null=True, blank=True)
     bank = models.CharField(max_length=90, null=True, blank=True, default='Vee Bank')
     bank_code = models.CharField(max_length=90, null=True, blank=True, default='00')
     is_external = models.BooleanField(default=False)
     is_internal = models.BooleanField(default=False)
-    def __str__(self):
-        return self.account_name
+

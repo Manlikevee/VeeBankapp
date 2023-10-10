@@ -798,7 +798,7 @@ def Savebeneficiary(request, id, pk):
     if request.method == 'GET':
         mytrans = Transaction.objects.filter(reference=id).first()
         if mytrans:
-            new_beneficiary = Beneficary.objects.filter(account_number=mytrans.Bank_accountnumber, user=request.user).first()
+            new_beneficiary = Beneficary.objects.filter(account_number=mytrans.Bank_accountnumber).filter(user=request.user).first()
 
             if not new_beneficiary:
                 sender_record = Beneficary.objects.create(
@@ -853,13 +853,14 @@ def Savebeneficiary(request, id, pk):
 @api_view(['POST', 'GET'])
 def Savebeneficiarytwo(request, id, pk):
     if request.method == 'GET':
+        myuser = request.user
         mytrans = Transaction.objects.filter(reference=id).first()
         if mytrans:
-            new_beneficiary = Beneficary.objects.filter(account_number=mytrans.Bank_accountnumber, user=request.user).first()
+            new_beneficiary = Beneficary.objects.filter(account_number=mytrans.Bank_accountnumber).filter(user=request.user).first()
 
             if not new_beneficiary:
                 sender_record = Beneficary.objects.create(
-                    user=request.user,
+                    user=myuser,
                     account_number=mytrans.Bank_accountnumber,  # Use '=' for field assignment
                     account_name=mytrans.recipient_user,  # Use '=' for field assignment
                     bank=mytrans.Bank_name,
@@ -881,30 +882,10 @@ def Savebeneficiarytwo(request, id, pk):
 
     my_user = request.user
 
-    # Ensure the user exists before proceeding
-    if not my_user:
-        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
     if request.method == 'POST':
         accountno = request.data.get('accountnumber')
         account_name = request.data.get('accountname')
 
-        new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
-        if not new_beneficiary:
-            sender_record = Beneficary.objects.create(
-                user=request.user,
-                account_number=accountno,  # Use '=' for field assignment
-                account_name=account_name,  # Use '=' for field assignment
-                bank='Vee Bank',
-                bank_code='001',
-                is_internal=True,  # Use 'True' with an uppercase 'T'
-                is_external=False,  # Use 'True' with an uppercase 'T'
-            )
-
-            sender_record.save()
-            return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_200_OK)
 
