@@ -839,10 +839,12 @@ def Savebeneficiary(request):
 @permission_classes([IsAuthenticated])
 def getbeneficary(request):
     my_user = request.user
-    new_beneficiary = Beneficary.objects.filter(user=my_user).all()
+    new_beneficiary = Beneficary.objects.filter(user=my_user).exclude(is_internal=True).all()
     mybeneficarydata = BeneficarySerializer(new_beneficiary, many=True)
-
+    inhousebeneficary = Beneficary.objects.filter(user=my_user).exclude(is_external=True).all()
+    inhousebeneficarymybeneficarydata = BeneficarySerializer(inhousebeneficary, many=True)
     context = {
         'mybeneficary': mybeneficarydata.data,
+        'inhousebeneficary': inhousebeneficarymybeneficarydata.data
     }
     return Response(context, status=status.HTTP_200_OK)
