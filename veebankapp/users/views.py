@@ -809,9 +809,9 @@ def Savebeneficiary(request):
         bankcode = request.data.get('bankcode')
         accountno = request.data.get('accountnumber')
         account_name = request.data.get('accountname')
+        is_internal = request.data.get('is_internal')
 
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
-        is_internal = bank == 'Vee Bank'
         is_external = not is_internal
         if not new_beneficiary:
             serializer = BeneficarySerializer(data={
