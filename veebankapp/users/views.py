@@ -818,6 +818,7 @@ def Savebeneficiary(request):
                 account_name=account_name,  # Use '=' for field assignment
                 bank=bank,
                 bank_code=bankcode,
+                is_internal=False,
                 is_external=True,  # Use 'True' with an uppercase 'T'
             )
 
@@ -854,6 +855,7 @@ def Savebeneficiarytwo(request):
                 bank='Vee Bank',
                 bank_code='001',
                 is_internal=True,  # Use 'True' with an uppercase 'T'
+                is_external=False,  # Use 'True' with an uppercase 'T'
             )
 
             sender_record.save()
