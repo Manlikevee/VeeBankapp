@@ -791,12 +791,12 @@ def setpinandprofile(request):
 
     return Response({'detail': 'Profile and PIN updated successfully'}, status=status.HTTP_200_OK)
 
+
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
 def Savebeneficiary(request):
     if request.method == 'GET':
         return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
     my_user = request.user
 
@@ -811,14 +811,18 @@ def Savebeneficiary(request):
         account_name = request.data.get('accountname')
 
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
-
+        is_internal = bank == 'Vee Bank'
+        is_external = not is_internal
         if not new_beneficiary:
             serializer = BeneficarySerializer(data={
                 'account_number': accountno,
                 'account_name': account_name,
                 'bank': bank,
                 'bank_code': bankcode,
-                'user': my_user.id
+                'user': my_user.id,
+                'is_internal': is_internal,
+                'is_external': is_external,
+
             })
             if serializer.is_valid():
                 serializer.save()
@@ -831,7 +835,7 @@ def Savebeneficiary(request):
     return Response(status=status.HTTP_200_OK)
 
 
-@api_view([ 'GET'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getbeneficary(request):
     my_user = request.user
