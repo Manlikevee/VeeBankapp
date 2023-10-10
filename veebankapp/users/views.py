@@ -813,7 +813,7 @@ def Savebeneficiary(request):
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
         if not new_beneficiary:
             sender_record = Beneficary.objects.create(
-                user=my_user,
+                user=my_user.id,
                 account_number=accountno,  # Use '=' for field assignment
                 account_name=account_name,  # Use '=' for field assignment
                 bank=bank,
@@ -849,7 +849,7 @@ def Savebeneficiarytwo(request):
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
         if not new_beneficiary:
             sender_record = Beneficary.objects.create(
-                user=my_user,
+                user=my_user.id,
                 account_number=accountno,  # Use '=' for field assignment
                 account_name=account_name,  # Use '=' for field assignment
                 bank='Vee Bank',
