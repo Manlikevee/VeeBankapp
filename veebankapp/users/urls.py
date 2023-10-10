@@ -21,7 +21,7 @@ urlpatterns = [
     path('BankAccounts', BankAccounts, name='BankAccounts'),
     path('new_transaction', new_transaction, name='new_transaction'),
     path('singletrans/<str:id>', singletrans, name='singletrans'),
-    path('singletransbackup/<str:id>', singletransbackup, name='singletransbackup'),
+    path('singletransbackup/<str:id>/', singletransbackup, name='singletransbackup'),
     path('airtime', import_data_plans, name='import_data_plans'),
     path('outward', donetransactionsoutward, name='donetransactionsoutward'),
     path('donetransactionbill', donetransactionbill, name='donetransactionbill'),
@@ -33,8 +33,8 @@ urlpatterns = [
     path('imgtext/', imgtext, name='user-imgtext'),
     path('setpinandprofile/', setpinandprofile, name='setpinandprofile'),
     path('AvailableImages/', AvailableImages, name='AvailableImages'),
-    path('Savebeneficiary/', Savebeneficiary, name='Savebeneficary'),
+    path('Savebeneficiary/<str:id>/<str:pk>/', Savebeneficiary, name='Savebeneficary'),
     path('getbeneficary/', getbeneficary, name='getbeneficary'),
-    path('Savebeneficiaryinternal/', Savebeneficiarytwo, name='Savebeneficiarytwo'),
+    path('Savebeneficiaryinternal/<str:id>/<str:pk>/', Savebeneficiarytwo, name='Savebeneficiarytwo'),
 
 ]

@@ -794,9 +794,28 @@ def setpinandprofile(request):
 
 @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
-def Savebeneficiary(request):
+def Savebeneficiary(request, id, pk):
     if request.method == 'GET':
-        return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        mytrans = Transaction.objects.filter(reference=id).first()
+        if mytrans:
+            new_beneficiary = Beneficary.objects.filter(account_number=mytrans.Bank_accountnumber, user=request.user).first()
+
+            if not new_beneficiary:
+                sender_record = Beneficary.objects.create(
+                    user=request.user,
+                    account_number=mytrans.Bank_accountnumber,  # Use '=' for field assignment
+                    account_name=mytrans.recipient_user,  # Use '=' for field assignment
+                    bank=mytrans.Bank_name,
+                    bank_code=pk,
+                    is_internal=False,  # Use 'True' with an uppercase 'T'
+                    is_external=True,  # Use 'True' with an uppercase 'T'
+                )
+
+                sender_record.save()
+                return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
+
+            else:
+                return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
 
     my_user = request.user
 
@@ -830,11 +849,35 @@ def Savebeneficiary(request):
     return Response(status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 @api_view(['POST', 'GET'])
-def Savebeneficiarytwo(request):
+def Savebeneficiarytwo(request, id, pk):
     if request.method == 'GET':
-        return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        mytrans = Transaction.objects.filter(reference=id).first()
+        if mytrans:
+            new_beneficiary = Beneficary.objects.filter(account_number=mytrans.Bank_accountnumber, user=request.user).first()
+
+            if not new_beneficiary:
+                sender_record = Beneficary.objects.create(
+                    user=request.user,
+                    account_number=mytrans.Bank_accountnumber,  # Use '=' for field assignment
+                    account_name=mytrans.recipient_user,  # Use '=' for field assignment
+                    bank=mytrans.Bank_name,
+                    bank_code=pk,
+                    is_internal=True,  # Use 'True' with an uppercase 'T'
+                    is_external=False,  # Use 'True' with an uppercase 'T'
+                )
+
+                sender_record.save()
+                return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
+
+            else:
+                return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    else:
+        return Response({'detail': 'An Eror Occured'}, status=status.HTTP_400_BAD_REQUEST)
 
     my_user = request.user
 
