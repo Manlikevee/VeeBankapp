@@ -35,5 +35,6 @@ urlpatterns = [
     path('AvailableImages/', AvailableImages, name='AvailableImages'),
     path('Savebeneficiary/', Savebeneficiary, name='Savebeneficary'),
     path('getbeneficary/', getbeneficary, name='getbeneficary'),
+    path('Savebeneficiaryinternal/', Savebeneficiarytwo, name='Savebeneficiarytwo'),
 
 ]

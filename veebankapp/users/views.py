@@ -809,10 +809,8 @@ def Savebeneficiary(request):
         bankcode = request.data.get('bankcode')
         accountno = request.data.get('accountnumber')
         account_name = request.data.get('accountname')
-        is_internal = request.data.get('is_internal')
 
         new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
-        is_external = not is_internal
         if not new_beneficiary:
             serializer = BeneficarySerializer(data={
                 'account_number': accountno,
@@ -820,8 +818,45 @@ def Savebeneficiary(request):
                 'bank': bank,
                 'bank_code': bankcode,
                 'user': my_user.id,
-                'is_internal': is_internal,
-                'is_external': is_external,
+                'is_external': True,
+
+            })
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'detail': 'Beneficiary updated successfully'}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Beneficiary Already Set'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+@api_view(['POST', 'GET'])
+def Savebeneficiarytwo(request):
+    if request.method == 'GET':
+        return Response({'detail': 'GET request not supported'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    my_user = request.user
+
+    # Ensure the user exists before proceeding
+    if not my_user:
+        return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'POST':
+        accountno = request.data.get('accountnumber')
+        account_name = request.data.get('accountname')
+
+        new_beneficiary = Beneficary.objects.filter(account_number=accountno, user=my_user).first()
+        if not new_beneficiary:
+            serializer = BeneficarySerializer(data={
+                'account_number': accountno,
+                'account_name': account_name,
+                'bank': 'Vee Bank',
+                'bank_code': '001',
+                'user': my_user.id,
+                'is_internal': True,
 
             })
             if serializer.is_valid():
